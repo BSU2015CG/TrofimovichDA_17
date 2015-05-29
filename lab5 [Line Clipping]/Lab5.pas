@@ -6,8 +6,10 @@ Type
     end;
 
 Var 
-    n, i, wsizeX, wsizeY  : Integer;
+    n, i, wsizeX, wsizeY, csx, csy : Integer;
     lines : Array of Vec2x2;
+    coordsx, coordsy : Array of Double;
+    cenx, ceny : Double;
     wind, cur : Vec2x2;
 
 Procedure LoadData;
@@ -58,6 +60,16 @@ begin
     wind.x2 := (wind.x2 - minX) / sizeX;
     wind.y1 := (wind.y1 - minY) / sizeY;
     wind.y2 := (wind.y2 - minY) / sizeY;
+    csx := Floor(maxX) - Ceil(minX) + 1;
+    coordsx := new Double[csx];
+    For i := Ceil(minX) to Floor(maxX) do
+        coordsx[i-Ceil(minX)] := (i - minX) / sizeX;
+    csy := Floor(maxY) - Ceil(minY) + 1;
+    coordsy := new Double[csy];
+    For i := Ceil(minY) to Floor(maxY) do
+        coordsy[i-Ceil(minY)] := (i - minY) / sizeY;
+    cenx := (0 - minX) / sizeX;
+    ceny := (0 - minY) / sizeY;
 end;
 
 function VisibleLine(var minT, maxT: Double; p, q: double):Boolean;
@@ -182,6 +194,39 @@ Begin
     SetWindowTitle('Алгоритм Лианга-Барского (слева) и алгоритм средней точки (справа)');
     SetPenColor(Color.White);
     Line(wsizeX div 2, 0, wsizeX div 2, wsizeY);
+    
+    SetPenColor(Color.FromArgb(40,40,40));
+    For i := 0 to csx - 1 do begin
+        Line(Round(10+(wsizeX div 2 - 20)*coordsx[i]), Round(wsizeY-10-(wsizeY-20)*0.0),
+             Round(10+(wsizeX div 2 - 20)*coordsx[i]), Round(wsizeY-10-(wsizeY-20)*1.0));
+        Line(Round(wsizeX div 2 + 10+(wsizeX div 2 - 20)*coordsx[i]), Round(wsizeY-10-(wsizeY-20)*0.0),
+             Round(wsizeX div 2 + 10+(wsizeX div 2 - 20)*coordsx[i]), Round(wsizeY-10-(wsizeY-20)*1.0));
+    end;
+    
+    For i := 0 to csy - 1 do begin
+        Line(Round(10+(wsizeX div 2 - 20)*0.0), Round(wsizeY-10-(wsizeY-20)*coordsy[i]),
+             Round(10+(wsizeX div 2 - 20)*1.0), Round(wsizeY-10-(wsizeY-20)*coordsy[i]));
+        Line(Round(wsizeX div 2 + 10+(wsizeX div 2 - 20)*0.0), Round(wsizeY-10-(wsizeY-20)*coordsy[i]),
+             Round(wsizeX div 2 + 10+(wsizeX div 2 - 20)*1.0), Round(wsizeY-10-(wsizeY-20)*coordsy[i]));
+    end;
+    
+    SetPenColor(Color.FromArgb(130,130,130));
+    if (cenx >= 0.0) and (cenx <= 1.0) then
+    begin
+        Line(Round(10+(wsizeX div 2 - 20)*cenx), Round(wsizeY-10-(wsizeY-20)*0.0),
+             Round(10+(wsizeX div 2 - 20)*cenx), Round(wsizeY-10-(wsizeY-20)*1.0));
+        Line(Round(wsizeX div 2 + 10+(wsizeX div 2 - 20)*cenx), Round(wsizeY-10-(wsizeY-20)*0.0),
+             Round(wsizeX div 2 + 10+(wsizeX div 2 - 20)*cenx), Round(wsizeY-10-(wsizeY-20)*1.0));
+    end;
+    if (ceny >= 0.0) and (ceny <= 1.0) then
+    begin
+        Line(Round(10+(wsizeX div 2 - 20)*0.0), Round(wsizeY-10-(wsizeY-20)*ceny),
+             Round(10+(wsizeX div 2 - 20)*1.0), Round(wsizeY-10-(wsizeY-20)*ceny));
+        Line(Round(wsizeX div 2 + 10+(wsizeX div 2 - 20)*0.0), Round(wsizeY-10-(wsizeY-20)*ceny),
+             Round(wsizeX div 2 + 10+(wsizeX div 2 - 20)*1.0), Round(wsizeY-10-(wsizeY-20)*ceny));
+    end;
+    
+    
     
     SetPenColor(Color.Yellow);
     DrawRectangle(Round(10+(wsizeX div 2 - 20)*wind.x1), Round(wsizeY-10-(wsizeY-20)*wind.y1),
